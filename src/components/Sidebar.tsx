@@ -33,31 +33,16 @@ const Sidebar: React.FC = () => {
       {/* Logo */}
       <div className="p-6 max-h-20">
         <div className="flex items-center gap-2">
-          <svg className="w-8 h-8" viewBox="0 0 200 200" fill="none">
-            <circle
-              cx="100"
-              cy="100"
-              r="85"
-              fill="none"
-              stroke="#FF6B35"
-              strokeWidth="20"
-            />
-            <circle cx="100" cy="100" r="50" fill="#001F5C" />
-            <path
-              d="M 70 100 L 90 120 L 130 70"
-              stroke="white"
-              strokeWidth="12"
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          <span className="font-bold text-gray-900">planeer</span>
+          <img
+            src="Planeer-logo-Orange.jpg"
+            alt="planeer logo"
+            className="w-40 h-20 mr-2"
+          />
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 py-6 space-y-2">
+      <nav className="flex-1 px-6 py-6 space-y-2">
         {menuItems.map((item) => (
           <button
             key={item.path}

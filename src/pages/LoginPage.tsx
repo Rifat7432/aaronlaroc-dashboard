@@ -22,84 +22,71 @@ const LoginPage: React.FC = () => {
       {/* Left Side - Login Form */}
       <div className="w-full md:w-1/2 flex flex-col justify-center px-8 md:px-16 lg:px-24 py-12">
         <div className="mb-12 flex items-center">
-          <svg className="w-12 h-12" viewBox="0 0 200 200" fill="none">
-            <circle
-              cx="100"
-              cy="100"
-              r="85"
-              fill="none"
-              stroke="#FF6B35"
-              strokeWidth="20"
-            />
-            <circle cx="100" cy="100" r="50" fill="#001F5C" />
-            <path
-              d="M 70 100 L 90 120 L 130 70"
-              stroke="white"
-              strokeWidth="12"
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          <span className="text-2xl font-bold text-blue-600 ml-2">planeer</span>
+          <img
+            src="Planeer-logo-Orange.jpg"
+            alt="planeer logo"
+            className="w-72 h-36 mr-2"
+          />
         </div>
-
-        <h1 className="text-4xl font-bold text-gray-900 mb-3">Welcome Back</h1>
-        <p className="text-gray-500 mb-8">
-          Hey, welcome back to your special place
-        </p>
-
-        <div className="space-y-5">
-          <div>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-700 focus:border-transparent bg-gray-50"
-              placeholder="stanley@gmail.com"
-            />
-          </div>
-
-          <div>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-700 focus:border-transparent bg-gray-50"
-              placeholder="Password"
-            />
-          </div>
-
-          <div className="flex items-center justify-between">
-            <label className="flex items-center cursor-pointer">
+        <div className="px-8">
+       
+          <h1 className="text-4xl font-bold text-gray-900 mb-3">
+            Welcome Back
+          </h1>
+          <p className="text-gray-500 mb-8">
+            Hey, welcome back to your special place
+          </p>
+          <div className="space-y-5">
+            <div>
               <input
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                className="w-4 h-4 rounded border-gray-300"
-                style={{ accentColor: "#6366F1" }}
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-700 focus:border-transparent bg-gray-50"
+                placeholder="stanley@gmail.com"
               />
-              <span className="ml-2 text-sm text-gray-600">Remember me</span>
-            </label>
-            <button className="text-sm text-gray-500 hover:text-gray-700">
-              Forgot Password?
+            </div>
+
+            <div>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-700 focus:border-transparent bg-gray-50"
+                placeholder="Password"
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <label className="flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="w-4 h-4 rounded border-gray-300"
+                  style={{ accentColor: "#6366F1" }}
+                />
+                <span className="ml-2 text-sm text-gray-600">Remember me</span>
+              </label>
+              <button className="text-sm text-gray-500 hover:text-gray-700">
+                Forgot Password?
+              </button>
+            </div>
+
+            <button
+              onClick={(e: any) => handleSignIn(e)}
+              className="bg-sky-700 text-white py-3 rounded-lg font-semibold hover:bg-sky-800 transition duration-200 shadow-md px-8"
+            >
+              Sign in
             </button>
           </div>
-
-          <button
-            onClick={(e: any) => handleSignIn(e)}
-            className="bg-sky-700 text-white py-3 rounded-lg font-semibold hover:bg-sky-800 transition duration-200 shadow-md px-8"
-          >
-            Sign in
-          </button>
+          <p className="text-center text-gray-600 mt-8">
+            Don't have an account?{" "}
+            <button className="text-sky-700 font-semibold hover:text-sky-800">
+              Sign Up
+            </button>
+          </p>
         </div>
-
-        <p className="text-center text-gray-600 mt-8">
-          Don't have an account?{" "}
-          <button className="text-sky-700 font-semibold hover:text-sky-800">
-            Sign Up
-          </button>
-        </p>
       </div>
 
       {/* Right Side - Illustration */}
