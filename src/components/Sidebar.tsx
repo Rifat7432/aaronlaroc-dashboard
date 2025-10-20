@@ -1,15 +1,15 @@
-import { useNavigate, useLocation } from "react-router-dom"
-import { LogOut } from "lucide-react"
-import React from "react"
+import { useNavigate, useLocation } from "react-router-dom";
+import { LogOut } from "lucide-react";
+import React from "react";
 
 interface MenuItem {
-  label: string
-  path: string
+  label: string;
+  path: string;
 }
 
 const Sidebar: React.FC = () => {
-  const navigate = useNavigate()
-  const location = useLocation()
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const menuItems: MenuItem[] = [
     { label: "Overview", path: "/" },
@@ -18,9 +18,15 @@ const Sidebar: React.FC = () => {
     { label: "Analytics", path: "/analytics" },
     { label: "Reports", path: "/reports" },
     { label: "Corporate", path: "/corporate" },
-  ]
+  ];
+  const handleSignOut = (): void => {
+    // Add your navigation logic here
 
-  const isActive = (path: string) => location.pathname === path
+    localStorage.removeItem("isAuthenticated");
+
+    navigate("/login");
+  };
+  const isActive = (path: string) => location.pathname === path;
 
   return (
     <div className="w-48 bg-white flex flex-col rounded-tl-lg">
@@ -28,7 +34,14 @@ const Sidebar: React.FC = () => {
       <div className="p-6 max-h-20">
         <div className="flex items-center gap-2">
           <svg className="w-8 h-8" viewBox="0 0 200 200" fill="none">
-            <circle cx="100" cy="100" r="85" fill="none" stroke="#FF6B35" strokeWidth="20" />
+            <circle
+              cx="100"
+              cy="100"
+              r="85"
+              fill="none"
+              stroke="#FF6B35"
+              strokeWidth="20"
+            />
             <circle cx="100" cy="100" r="50" fill="#001F5C" />
             <path
               d="M 70 100 L 90 120 L 130 70"
@@ -62,13 +75,16 @@ const Sidebar: React.FC = () => {
 
       {/* Logout */}
       <div className="p-4 border-t border-gray-200">
-        <button className="w-full flex items-center gap-2 text-gray-700 hover:text-gray-900 font-medium">
+        <button
+          onClick={handleSignOut}
+          className="w-full flex items-center gap-2 text-gray-700 hover:text-gray-900 font-medium"
+        >
           <LogOut size={20} />
           Log out
         </button>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Sidebar
+export default Sidebar;

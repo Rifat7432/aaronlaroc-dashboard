@@ -233,12 +233,12 @@ const AllUsers: React.FC = () => {
         </div>
 
         <div className="bg-white border border-gray-200 rounded-2xl p-6">
-          <p className="text-gray-600 text-sm mb-2">Alerts</p>
+          <p className="text-gray-600 text-sm mb-2">Active Users</p>
           <p className="text-4xl font-bold text-sky-900 mb-2">08</p>
         </div>
 
         <div className="bg-white border border-gray-200 rounded-2xl p-6">
-          <p className="text-gray-600 text-sm mb-2">Issues List</p>
+          <p className="text-gray-600 text-sm mb-2">Inactive Users</p>
           <p className="text-4xl font-bold text-sky-900 mb-2">02</p>
         </div>
       </div>

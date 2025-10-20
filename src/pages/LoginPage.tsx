@@ -88,7 +88,7 @@ const LoginPage: React.FC = () => {
 
           <button
             onClick={(e: any) => handleSignIn(e)}
-            className="w-full bg-sky-700 text-white py-3 rounded-lg font-semibold hover:bg-sky-800 transition duration-200 shadow-md"
+            className="bg-sky-700 text-white py-3 rounded-lg font-semibold hover:bg-sky-800 transition duration-200 shadow-md px-8"
           >
             Sign in
           </button>
