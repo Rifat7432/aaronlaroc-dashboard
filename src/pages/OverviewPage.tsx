@@ -8,46 +8,49 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import {
+  useGetAdminUserAnalysisQuery,
+  useGetAdminUserStatsQuery,
+} from "../redux/features/user/userApi";
+import { storDashboardData } from "../redux/features/user/userSlice";
+import { useAppDispatch } from "../redux/hooks/hooks";
 
 type Period = "daily" | "monthly" | "yearly";
 
 // Define different datasets for each time period
-const chartData: Record<Period, { name: string; users: number }[]> = {
-  daily: [
-    { name: "Mon", users: 120 },
-    { name: "Tue", users: 180 },
-    { name: "Wed", users: 150 },
-    { name: "Thu", users: 220 },
-    { name: "Fri", users: 280 },
-    { name: "Sat", users: 190 },
-    { name: "Sun", users: 160 },
-  ],
-  monthly: [
-    { name: "Jan", users: 3200 },
-    { name: "Feb", users: 2800 },
-    { name: "Mar", users: 4100 },
-    { name: "Apr", users: 3600 },
-    { name: "May", users: 4500 },
-    { name: "Jun", users: 5200 },
-    { name: "Jul", users: 4800 },
-    { name: "Aug", users: 5500 },
-    { name: "Sep", users: 6100 },
-    { name: "Oct", users: 5800 },
-    { name: "Nov", users: 6400 },
-    { name: "Dec", users: 7000 },
-  ],
-  yearly: [
-    { name: "2019", users: 32000 },
-    { name: "2020", users: 45000 },
-    { name: "2021", users: 58000 },
-    { name: "2022", users: 72000 },
-    { name: "2023", users: 89000 },
-    { name: "2024", users: 105000 },
-  ],
-};
 
 export default function OverviewPage() {
   const [period, setPeriod] = useState("daily");
+  const dispatch = useAppDispatch();
+
+  const { data, isLoading } = useGetAdminUserAnalysisQuery({
+    type: period,
+  });
+  const { data: statsData, isLoading: isLoadingStats } =
+    useGetAdminUserStatsQuery({
+      type: period,
+    });
+  if (isLoading || isLoadingStats) {
+    return <div className="p-8">Loading...</div>;
+  }
+
+  if (!data || !statsData) {
+    return <div className="p-8">No data available</div>;
+  }
+  dispatch(
+    storDashboardData({
+      users: statsData.data.totalUsers,
+      newUsers: statsData.data.newUsersLastNDays,
+      issues: statsData.data.totalReports,
+    })
+  );
+
+  const chartData: Record<Period, { name: string; users: number }[]> = {
+    daily: data.daily,
+    monthly: data.monthly,
+    yearly: data.yearly,
+  };
+
   return (
     <div className="p-8">
       <h1 className="text-3xl font-bold text-sky-900 mb-8">Overview</h1>
@@ -55,18 +58,18 @@ export default function OverviewPage() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white border border-gray-200 rounded-2xl p-6">
-          <p className="text-gray-600 text-sm mb-2">New Users</p>
-          <p className="text-4xl font-bold text-sky-900 mb-2">10</p>
+          <p className="text-gray-600 text-sm mb-2">All Users</p>
+          <p className="text-4xl font-bold text-sky-900 mb-2">{statsData.data.totalUsers}</p>
         </div>
 
         <div className="bg-white border border-gray-200 rounded-2xl p-6">
-          <p className="text-gray-600 text-sm mb-2">Alerts</p>
-          <p className="text-4xl font-bold text-sky-900 mb-2">08</p>
+          <p className="text-gray-600 text-sm mb-2">New Users</p>
+          <p className="text-4xl font-bold text-sky-900 mb-2">{statsData.data.newUsersLastNDays}</p>
         </div>
 
         <div className="bg-white border border-gray-200 rounded-2xl p-6">
           <p className="text-gray-600 text-sm mb-2">Issues List</p>
-          <p className="text-4xl font-bold text-sky-900 mb-2">02</p>
+          <p className="text-4xl font-bold text-sky-900 mb-2">{statsData.data.totalReports}</p>
         </div>
       </div>
 

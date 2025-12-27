@@ -10,43 +10,83 @@ import {
 } from "recharts";
 import RevenueChart from "../components/RevenueChart";
 import { useState } from "react";
+import { useGetAdminUserAnalysisQuery } from "../redux/features/user/userApi";
+import { useAppSelector } from "../redux/hooks/hooks";
 type Period = "daily" | "monthly" | "yearly";
-const chartData: Record<Period, { name: string; users: number }[]> = {
-  daily: [
-    { name: "Mon", users: 120 },
-    { name: "Tue", users: 180 },
-    { name: "Wed", users: 150 },
-    { name: "Thu", users: 220 },
-    { name: "Fri", users: 280 },
-    { name: "Sat", users: 190 },
-    { name: "Sun", users: 160 },
-  ],
-  monthly: [
-    { name: "Jan", users: 3200 },
-    { name: "Feb", users: 2800 },
-    { name: "Mar", users: 4100 },
-    { name: "Apr", users: 3600 },
-    { name: "May", users: 4500 },
-    { name: "Jun", users: 5200 },
-    { name: "Jul", users: 4800 },
-    { name: "Aug", users: 5500 },
-    { name: "Sep", users: 6100 },
-    { name: "Oct", users: 5800 },
-    { name: "Nov", users: 6400 },
-    { name: "Dec", users: 7000 },
-  ],
-  yearly: [
-    { name: "2019", users: 32000 },
-    { name: "2020", users: 45000 },
-    { name: "2021", users: 58000 },
-    { name: "2022", users: 72000 },
-    { name: "2023", users: 89000 },
-    { name: "2024", users: 105000 },
-  ],
-};
+interface UserData {
+  totalUsers: number;
+  newUsers: number;
+  lastMonthTotalUsers?: number; // Optional
+  lastMonthNewUsers?: number; // Optional
+}
+
+function calculateUserMetrics(data: UserData) {
+  const activeUsers = data.totalUsers - data.newUsers;
+  const inactiveUsers =
+    data.lastMonthTotalUsers !== undefined
+      ? data.lastMonthTotalUsers - data.lastMonthNewUsers!
+      : 0;
+
+  const activeUsersIncrease =
+    data.lastMonthTotalUsers !== undefined
+      ? ((activeUsers -
+          (data.lastMonthTotalUsers - (data.lastMonthNewUsers || 0))) /
+          (data.lastMonthTotalUsers - (data.lastMonthNewUsers || 0))) *
+        100
+      : undefined;
+
+  const newUsersIncrease =
+    data.lastMonthNewUsers !== undefined
+      ? ((data.newUsers - data.lastMonthNewUsers) / data.lastMonthNewUsers) *
+        100
+      : undefined;
+
+  const inactiveUsersIncrease =
+    data.lastMonthTotalUsers !== undefined
+      ? ((inactiveUsers -
+          (data.lastMonthTotalUsers - (data.lastMonthNewUsers || 0))) /
+          (data.lastMonthTotalUsers - (data.lastMonthNewUsers || 0))) *
+        100
+      : undefined;
+
+  return {
+    activeUsers,
+    inactiveUsers,
+    activeUsersIncrease,
+    newUsersIncrease,
+    inactiveUsersIncrease,
+  };
+}
+
+// Example usage with missing last month data
 
 export default function AnalyticsPage() {
   const [period, setPeriod] = useState("daily");
+  const { newUsers, users } = useAppSelector(
+    (state) => state.user.dashboardData
+  );
+
+  const { data, isLoading } = useGetAdminUserAnalysisQuery({
+    type: period,
+  });
+  if (isLoading) {
+    return <div className="p-8">Loading...</div>;
+  }
+
+  if (!data) {
+    return <div className="p-8">No data available</div>;
+  }
+  const chartData: Record<Period, { name: string; users: number }[]> = {
+    daily: data.daily,
+    monthly: data.monthly,
+    yearly: data.yearly,
+  };
+  const userData: UserData = {
+    totalUsers: users,
+    newUsers,
+    // lastMonthTotalUsers and lastMonthNewUsers are not provided
+  };
+  const metrics = calculateUserMetrics(userData);
   return (
     <div className="p-8">
       <h1 className="text-3xl font-bold text-sky-900 mb-8">Analytics</h1>
@@ -57,10 +97,10 @@ export default function AnalyticsPage() {
           {" "}
           <div className="bg-white border border-gray-200 rounded-2xl p-6">
             <p className="text-lg font-semibold text-sky-900 mb-2">New Users</p>
-            <p className="text-4xl font-bold text-sky-900 mb-2">10</p>
+            <p className="text-4xl font-bold text-sky-900 mb-2">{newUsers}</p>
             <p className="text-end text-sm font-semibold text-sky-900">
               <span className="text-green-600 text-sm font-semibold mr-2 bg-gray-100 p-[2px]">
-                +15.10%
+                +{metrics.newUsersIncrease?.toFixed(2) || 0}%
               </span>
               More than last month
             </p>
@@ -69,10 +109,12 @@ export default function AnalyticsPage() {
             <p className="text-lg font-semibold text-sky-900 mb-2">
               Active Users
             </p>
-            <p className="text-4xl font-bold text-sky-900 mb-2">08</p>
+            <p className="text-4xl font-bold text-sky-900 mb-2">
+              {metrics.activeUsers}
+            </p>
             <p className="text-end text-sm font-semibold text-sky-900">
               <span className="text-green-600 text-sm font-semibold mr-2 bg-gray-100 p-[2px]">
-                +15.10%
+                +{metrics.activeUsersIncrease?.toFixed(2) || 0}%
               </span>
               More than last month
             </p>
@@ -81,10 +123,12 @@ export default function AnalyticsPage() {
             <p className="text-lg font-semibold text-sky-900 mb-2">
               Inactive Users
             </p>
-            <p className="text-4xl font-bold text-sky-900 mb-2">02</p>
+            <p className="text-4xl font-bold text-sky-900 mb-2">
+              {metrics.inactiveUsers}
+            </p>
             <p className="text-end text-sm font-semibold text-sky-900">
               <span className="text-green-600 text-sm font-semibold mr-2 bg-gray-100 p-[2px]">
-                +15.10%
+                +{metrics.inactiveUsersIncrease?.toFixed(2) || 0}%
               </span>
               More than last month
             </p>
@@ -134,7 +178,7 @@ export default function AnalyticsPage() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                 <XAxis dataKey="name" stroke="#9CA3AF" />
                 <YAxis stroke="#9CA3AF" />
-                           <Tooltip
+                <Tooltip
                   contentStyle={{
                     backgroundColor: "#bae6fd",
                     border: "none",

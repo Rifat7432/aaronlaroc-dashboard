@@ -1,20 +1,73 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { jwtDecode } from "jwt-decode";
+import { useDispatch } from "react-redux";
+import { toast } from "sonner";
+import { useLoginMutation } from "../redux/features/auth/authApi";
+import {storToken, storUserData } from "../redux/features/auth/authSlice";
+
+
+type LoginFormData = {
+  email: string;
+  password: string;
+  rememberMe: boolean;
+};
 
 const LoginPage: React.FC = () => {
-  const [email, setEmail] = useState<string>("stanley@gmail.com");
-  const [password, setPassword] = useState<string>("••••••••••");
-  const [rememberMe, setRememberMe] = useState<boolean>(true);
   const navigate = useNavigate();
-  const handleSignIn = (e: React.FormEvent<HTMLFormElement>): void => {
-    e.preventDefault();
-    console.log("Sign in with:", email);
-    // Add your navigation logic here
-    if (email && password) {
-      localStorage.setItem("isAuthenticated", "true");
+  const dispatch = useDispatch();
+
+  const [loginUser, { isLoading }] = useLoginMutation();
+
+  // React Hook Form
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    defaultValues: {
+      email: "",
+      password: "",
+      rememberMe: true,
+    },
+  });
+
+  // Submit handler
+  const onSubmit = async (data: LoginFormData) => {
+    try {
+      const res: any = await loginUser({
+        email: data.email,
+        password: data.password,
+      });
+
+      // API error
+      if (res?.error) {
+        return toast.error(res.error?.data?.message || "Login failed");
+      }
+
+      // Success
+      if (res?.data?.success) {
+        const token = res.data.data.token;
+
+        toast.success(res.data.message || "Login successful");
+
+        // Store token
+
+        localStorage.setItem("accessToken", token);
+        dispatch(storToken(token));
+        // Decode token
+        const decoded: any = jwtDecode(token);
+        const { exp, iat, ...userData } = decoded;
+
+        dispatch(storUserData(userData));
+        navigate("/");
+      }
+    } catch (error) {
+      toast.error("Something went wrong");
     }
-    navigate("/");
   };
 
   return (
@@ -28,68 +81,76 @@ const LoginPage: React.FC = () => {
             className="w-72 h-36 mr-2"
           />
         </div>
+
         <div className="px-8">
-       
           <h1 className="text-4xl font-bold text-gray-900 mb-3">
             Welcome Back
           </h1>
           <p className="text-gray-500 mb-8">
             Hey, welcome back to your special place
           </p>
-          <div className="space-y-5">
+
+          {/* 🔥 FORM START */}
+          <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
             <div>
               <input
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                {...register("email", { required: "Email is required" })}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-700 focus:border-transparent bg-gray-50"
-                placeholder="stanley@gmail.com"
+                placeholder="Email Address"
               />
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.email.message}
+                </p>
+              )}
             </div>
 
             <div>
               <input
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                {...register("password", { required: "Password is required" })}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-700 focus:border-transparent bg-gray-50"
                 placeholder="Password"
               />
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.password.message}
+                </p>
+              )}
             </div>
 
             <div className="flex items-center justify-between">
               <label className="flex items-center cursor-pointer">
                 <input
                   type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
+                  {...register("rememberMe")}
                   className="w-4 h-4 rounded border-gray-300"
                   style={{ accentColor: "#6366F1" }}
                 />
                 <span className="ml-2 text-sm text-gray-600">Remember me</span>
               </label>
-              <button className="text-sm text-gray-500 hover:text-gray-700">
+
+              <button
+                type="button"
+                className="text-sm text-gray-500 hover:text-gray-700"
+              >
                 Forgot Password?
               </button>
             </div>
 
             <button
-              onClick={(e: any) => handleSignIn(e)}
-              className="bg-sky-700 text-white py-3 rounded-lg font-semibold hover:bg-sky-800 transition duration-200 shadow-md px-8"
+              type="submit"
+              disabled={isLoading}
+              className="bg-sky-700 text-white py-3 rounded-lg font-semibold hover:bg-sky-800 transition duration-200 shadow-md px-8 disabled:opacity-50"
             >
-              Sign in
+              {isLoading ? "Signing in..." : "Sign in"}
             </button>
-          </div>
-          <p className="text-center text-gray-600 mt-8">
-            Don't have an account?{" "}
-            <button className="text-sky-700 font-semibold hover:text-sky-800">
-              Sign Up
-            </button>
-          </p>
+          </form>
         </div>
       </div>
 
-      {/* Right Side - Illustration */}
+      {/* Right Side Illustration → UNCHANGED */}
       <div className="hidden md:flex w-1/2 bg-gradient-to-br from-indigo-400 via-purple-400 to-blue-400 items-center justify-center relative overflow-hidden">
         {/* Decorative Clouds */}
         <div className="absolute top-10 left-10 w-32 h-20 bg-white rounded-full opacity-60"></div>

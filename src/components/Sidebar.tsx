@@ -22,7 +22,7 @@ const Sidebar: React.FC = () => {
   const handleSignOut = (): void => {
     // Add your navigation logic here
 
-    localStorage.removeItem("isAuthenticated");
+    localStorage.removeItem("accessToken");
 
     navigate("/login");
   };

@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 
+type Category = "user" | "revenue" | "system";
+
 interface Report {
   id: number;
   title: string;
@@ -8,10 +10,12 @@ interface Report {
   status: "Completed" | "In Progress";
   color: string;
   icon: string;
+  category: Category;
 }
 
 const ReportsPage: React.FC = () => {
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
+  const [activeCategory, setActiveCategory] = useState<Category>("user");
 
   const reports: Report[] = [
     {
@@ -22,6 +26,7 @@ const ReportsPage: React.FC = () => {
       status: "Completed",
       color: "bg-green-100 text-green-800",
       icon: "📊",
+      category: "user",
     },
     {
       id: 2,
@@ -31,6 +36,7 @@ const ReportsPage: React.FC = () => {
       status: "Completed",
       color: "bg-blue-100 text-blue-800",
       icon: "💰",
+      category: "revenue",
     },
     {
       id: 3,
@@ -40,90 +46,58 @@ const ReportsPage: React.FC = () => {
       status: "Completed",
       color: "bg-purple-100 text-purple-800",
       icon: "⚡",
-    },
-    {
-      id: 4,
-      title: "Customer Feedback",
-      description: "Survey results and customer satisfaction ratings",
-      date: "August 2024",
-      status: "Completed",
-      color: "bg-yellow-100 text-yellow-800",
-      icon: "⭐",
-    },
-    {
-      id: 5,
-      title: "Security Audit",
-      description:
-        "Comprehensive security analysis and vulnerability assessment",
-      date: "In Progress",
-      status: "In Progress",
-      color: "bg-orange-100 text-orange-800",
-      icon: "🔒",
-    },
-    {
-      id: 6,
-      title: "Marketing Campaign",
-      description: "ROI and engagement metrics for recent campaigns",
-      date: "October 2024",
-      status: "Completed",
-      color: "bg-pink-100 text-pink-800",
-      icon: "📈",
+      category: "system",
     },
   ];
 
-  const handleReportClick = (report: Report): void => {
-    setSelectedReport(report);
-  };
+  const filteredReports = reports.filter(
+    (report) => report.category === activeCategory
+  );
 
-  const handleCloseModal = (): void => {
-    setSelectedReport(null);
-  };
-
-  const handleDownload = (): void => {
-    console.log("Downloading report:", selectedReport?.title);
-    // Add download logic here
-  };
-
-  const handleShare = (): void => {
-    console.log("Sharing report:", selectedReport?.title);
-    // Add share logic here
+  const handleDownload = () => {
+    console.log("Downloading PDF:", selectedReport?.title);
   };
 
   return (
     <div>
       <h1 className="text-3xl font-bold text-sky-900 mb-8 border-b border-gray-200 p-8">
-        Recent
+        Reports
       </h1>
-      <div className="space-y-6 p-8">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white border border-gray-200 rounded-2xl p-6">
-            <p className="text-gray-600 text-sm mb-2">Total Reports</p>
-            <p className="text-4xl font-bold text-sky-900 mb-2">10</p>
-          </div>
 
-          <div className="bg-white border border-gray-200 rounded-2xl p-6">
-            <p className="text-gray-600 text-sm mb-2">In Progress</p>
-            <p className="text-4xl font-bold text-sky-900 mb-2">08</p>
-          </div>
-
-          <div className="bg-white border border-gray-200 rounded-2xl p-6">
-            <p className="text-gray-600 text-sm mb-2">Completed</p>
-            <p className="text-4xl font-bold text-sky-900 mb-2">02</p>
-          </div>
+      <div className="p-8 space-y-8">
+        {/* Category Tabs */}
+        <div className="flex gap-3">
+          {[
+            { key: "user", label: "User Reports" },
+            { key: "revenue", label: "Revenue Analytics" },
+            { key: "system", label: "System Performance" },
+          ].map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveCategory(tab.key as Category)}
+              className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${
+                activeCategory === tab.key
+                  ? "bg-sky-900 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
 
         {/* Reports Grid */}
         <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
           <h3 className="text-xl font-bold text-gray-800 mb-6">
-            Recent Reports
+            Available Reports
           </h3>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {reports.map((report) => (
+            {filteredReports.map((report) => (
               <div
                 key={report.id}
-                className="border border-gray-200 rounded-lg p-5 hover:shadow-lg transition duration-200 cursor-pointer"
-                onClick={() => handleReportClick(report)}
+                onClick={() => setSelectedReport(report)}
+                className="border border-gray-200 rounded-lg p-5 hover:shadow-lg transition cursor-pointer"
               >
                 <div className="flex items-start justify-between mb-3">
                   <span className="text-4xl">{report.icon}</span>
@@ -133,69 +107,67 @@ const ReportsPage: React.FC = () => {
                     {report.status}
                   </span>
                 </div>
+
                 <h4 className="text-lg font-bold text-gray-800 mb-2">
                   {report.title}
                 </h4>
+
                 <p className="text-gray-600 text-sm mb-3">
                   {report.description}
                 </p>
+
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-gray-500">{report.date}</span>
-                  <button className="text-sky-600 text-sm font-medium hover:text-sky-800">
-                    View →
-                  </button>
+                  <span className="text-sky-700 text-sm font-semibold">
+                    PDF →
+                  </span>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Selected Report Modal */}
+        {/* Modal */}
         {selectedReport && (
           <div
             className="fixed inset-0 bg-black/65 flex items-center justify-center z-50"
-            onClick={handleCloseModal}
+            onClick={() => setSelectedReport(null)}
           >
             <div
-              className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full m-4"
-              onClick={(e: React.MouseEvent) => e.stopPropagation()}
+              className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full"
+              onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-2xl font-bold text-gray-800">
+              <div className="flex justify-between mb-4">
+                <h3 className="text-2xl font-bold">
                   {selectedReport.title}
                 </h3>
                 <button
-                  onClick={handleCloseModal}
-                  className="text-gray-500 hover:text-gray-800 text-2xl"
+                  className="text-2xl text-gray-500"
+                  onClick={() => setSelectedReport(null)}
                 >
                   ×
                 </button>
               </div>
-              <p className="text-gray-600 mb-4">{selectedReport.description}</p>
+
+              <p className="text-gray-600 mb-4">
+                {selectedReport.description}
+              </p>
+
               <div className="space-y-2 mb-6">
-                <p className="text-sm text-gray-600">
-                  <span className="font-semibold">Date:</span>{" "}
-                  {selectedReport.date}
+                <p className="text-sm">
+                  <strong>Date:</strong> {selectedReport.date}
                 </p>
-                <p className="text-sm text-gray-600">
-                  <span className="font-semibold">Status:</span>{" "}
-                  {selectedReport.status}
+                <p className="text-sm">
+                  <strong>Status:</strong> {selectedReport.status}
                 </p>
               </div>
-              <div className="flex gap-3">
-                <button
-                  onClick={handleDownload}
-                  className="flex-1 bg-sky-900 text-white py-2 px-4 rounded-lg font-semibold hover:bg-sky-800 transition duration-200"
-                >
-                  Download PDF
-                </button>
-                <button
-                  onClick={handleShare}
-                  className="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-semibold hover:bg-gray-300 transition duration-200"
-                >
-                  Share
-                </button>
-              </div>
+
+              <button
+                onClick={handleDownload}
+                className="w-full bg-sky-900 text-white py-2 rounded-lg font-semibold hover:bg-sky-800"
+              >
+                Download PDF
+              </button>
             </div>
           </div>
         )}
