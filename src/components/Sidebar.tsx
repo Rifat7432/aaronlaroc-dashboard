@@ -17,7 +17,7 @@ const Sidebar: React.FC = () => {
     { label: "All Users", path: "/users" },
     { label: "Analytics", path: "/analytics" },
     { label: "Reports", path: "/reports" },
-    { label: "Corporate", path: "/corporate" },
+    // { label: "Corporate", path: "/corporate" },
   ];
   const handleSignOut = (): void => {
     // Add your navigation logic here

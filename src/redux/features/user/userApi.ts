@@ -1,6 +1,5 @@
 import { baseApi } from "../../services/API";
 
-
 const userApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getUser: builder.query({
@@ -22,10 +21,17 @@ const userApi = baseApi.injectEndpoints({
     deleteUser: builder.mutation({
       query: (id: string) => {
         return {
-          url: `users/delete/${id}`,
+          url: `deleteUser/${id}`,
           method: "DELETE",
         };
       },
+    }),
+    updateUser: builder.mutation({
+      query: ({ id, body }) => ({
+        url: `adminUpdateUser/${id}`,
+        method: "PUT",
+        body,
+      }),
     }),
     blockUser: builder.mutation({
       query: (id: string) => {
@@ -38,7 +44,7 @@ const userApi = baseApi.injectEndpoints({
     getAllUsers: builder.query({
       query: (query) => {
         return {
-          url: "users",
+          url: "pagenationlist",
           method: "GET",
           params: query,
         };
@@ -80,5 +86,7 @@ export const {
   useBlockUserMutation,
   useDeleteUserMutation,
   useGetUserByIdQuery,
-  useGetAdminUserAnalysisQuery,useGetAdminUserStatsQuery
+  useGetAdminUserAnalysisQuery,
+  useGetAdminUserStatsQuery,
+  useUpdateUserMutation,
 } = userApi;

@@ -4,7 +4,7 @@ import DashboardLayout from "./components/DashboardLayout";
 import OverviewPage from "./pages/OverviewPage";
 import SupportPage from "./pages/SupportPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
-import CorporatePage from "./pages/CorporatePage";
+// import CorporatePage from "./pages/CorporatePage";
 import AllUsers from "./pages/AllUsersPage";
 import ReportsPage from "./pages/ReportsPage";
 
@@ -28,7 +28,7 @@ function App() {
           <Route path="users" element={<AllUsers />} />
           <Route path="analytics" element={<AnalyticsPage />} />
           <Route path="reports" element={<ReportsPage />} />
-          <Route path="corporate" element={<CorporatePage />} />
+          {/* <Route path="corporate" element={<CorporatePage />} /> */}
         </Route>
       </Routes>
     </Router>
