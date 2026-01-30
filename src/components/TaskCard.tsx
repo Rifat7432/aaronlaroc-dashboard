@@ -22,7 +22,7 @@ const TaskCard= ({
     Completed: "bg-green-100 text-green-700",
     "In Progress": "bg-orange-100 text-orange-700",
   }
-
+console.log(title,icon,description,date,status)
   return (
     <div className="bg-white border border-gray-200 rounded-tl-lg rounded-tr-2xl rounded-br-2xl rounded-bl-2xl p-6 hover:shadow-lg transition cursor-pointer" onClick={onView}>
       <div className="flex items-start justify-between mb-4">

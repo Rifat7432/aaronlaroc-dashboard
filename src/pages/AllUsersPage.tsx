@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import {
   useDeleteUserMutation,
   useGetAllUsersQuery,
@@ -43,9 +44,9 @@ const AllUsers: React.FC = () => {
   } = useForm<UserForm>();
 
   const { data } = useGetAllUsersQuery({
-    page,
-    limit: LIMIT,
-    search: searchTerm || undefined,
+    pageNo:page,
+    perPage: LIMIT,
+    searchKeyword: searchTerm || undefined,
   });
 
   const [updateUser] = useUpdateUserMutation();
@@ -69,28 +70,45 @@ const AllUsers: React.FC = () => {
       setEditValue("name", selectedUser.name);
       setEditValue("email", selectedUser.email);
       setEditValue("phone", selectedUser.phone);
-      setEditValue("role", selectedUser.role);
       setEditValue("status", selectedUser.status);
     }
   }, [selectedUser, showEditModal, setEditValue]);
 
   const onEditSubmitHandler = async (form: UserForm) => {
     if (!selectedUser) return;
-    await updateUser({
-      id: selectedUser._id,
-      body: {
-        email: form.email,
-        phoneNumber: form.phone,
-        role: form.role.toUpperCase(),
-      },
-    });
+    try {
+      const res: any = await updateUser({
+        id: selectedUser._id,
+        body: {
+          email: form.email,
+          phoneNumber: form.phone,
+          role: form.role.toUpperCase(),
+        },
+      });
+      if (res?.error) {
+        toast.error(res.error?.data?.message || "Failed to update user");
+      } else {
+        toast.success("User updated successfully");
+      }
+    } catch {
+      toast.error("Error updating user");
+    }
     setShowEditModal(false);
     setSelectedUser(null);
   };
 
   const confirmDelete = async () => {
     if (!selectedUser) return;
-    await deleteUser(selectedUser._id);
+    try {
+      const res: any = await deleteUser(selectedUser._id);
+      if (res?.error) {
+        toast.error(res.error?.data?.message || "Failed to delete user");
+      } else {
+        toast.success("User deleted successfully");
+      }
+    } catch {
+      toast.error("Error deleting user");
+    }
     setShowDeleteModal(false);
     setSelectedUser(null);
   };
@@ -291,14 +309,6 @@ const AllUsers: React.FC = () => {
                   placeholder="Phone"
                   className="border p-2 w-full rounded"
                 />
-                <select
-                  {...editRegister("role")}
-                  className="border p-2 w-full rounded"
-                >
-                  <option value="User">User</option>
-                  <option value="Manager">Manager</option>
-                  <option value="Admin">Admin</option>
-                </select>
                 <select
                   {...editRegister("status")}
                   className="border p-2 w-full rounded"

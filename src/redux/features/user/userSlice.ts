@@ -12,7 +12,16 @@ type TValue = {
 
   loading: boolean;
   collapsed: boolean;
-  dashboardData: { users: number; newUsers: number; issues: number };
+  dashboardData: {
+    users: number;
+    newUsers: number;
+    totalReports: number;
+    newUsersPercent: number;
+    currentMonthUsers: number;
+    activeUsersPercent: number;
+    inactiveUsers: number;
+    inactiveUsersPercent: number;
+  };
 };
 const initialState: TValue = {
   user: null,
@@ -20,7 +29,16 @@ const initialState: TValue = {
   decodeUser: null,
 
   collapsed: false,
-  dashboardData: { users: 0, newUsers: 0, issues: 0 },
+  dashboardData: {
+    users: 0,
+    newUsers: 0,
+    totalReports: 0,
+    newUsersPercent: 0,
+    currentMonthUsers: 0,
+    activeUsersPercent: 0,
+    inactiveUsers: 0,
+    inactiveUsersPercent: 0,
+  },
 };
 // product slice
 export const userSlice = createSlice({
@@ -32,8 +50,13 @@ export const userSlice = createSlice({
       actions: PayloadAction<{
         users: number;
         newUsers: number;
-        issues: number;
-      }>
+        totalReports: number;
+        newUsersPercent: number;
+        currentMonthUsers: number;
+        activeUsersPercent: number;
+        inactiveUsers: number;
+        inactiveUsersPercent: number;
+      }>,
     ) => {
       state.dashboardData = actions.payload;
     },
@@ -42,7 +65,7 @@ export const userSlice = createSlice({
     },
     storDecodeUser: (
       state,
-      actions: PayloadAction<{ email: string; userId: string }>
+      actions: PayloadAction<{ email: string; userId: string }>,
     ) => {
       state.decodeUser = actions.payload;
     },

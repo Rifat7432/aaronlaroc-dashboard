@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+
 export type TUser = {
   id: string;
   email: string;
@@ -11,6 +12,8 @@ type TInitialState = {
   token: string | null;
   collapsed: boolean;
   loading: boolean;
+  otpEmail?: string | null;
+  otp?: string | null;
 };
 
 const initialState: TInitialState = {
@@ -18,6 +21,8 @@ const initialState: TInitialState = {
   token: null,
   collapsed: false,
   loading: false,
+  otpEmail: null,
+  otp: null,
 };
 // authentication slice
 export const authSlice = createSlice({
@@ -36,6 +41,12 @@ export const authSlice = createSlice({
     isCollapsed: (state, actions) => {
       state.collapsed = actions.payload;
     },
+    setOtpEmail: (state, actions) => {
+      state.otpEmail = actions.payload;
+    },
+    setOTP: (state, actions) => {
+      state.otp = actions.payload;
+    },
     logOut: (state) => {
       state.user = null;
       state.token = null;
@@ -43,6 +54,13 @@ export const authSlice = createSlice({
     },
   },
 });
-export const { storToken, storUserData, setLoading, isCollapsed, logOut } =
-  authSlice.actions;
+export const {
+  storToken,
+  storUserData,
+  setLoading,
+  isCollapsed,
+  logOut,
+  setOtpEmail,
+  setOTP,
+} = authSlice.actions;
 export default authSlice.reducer;

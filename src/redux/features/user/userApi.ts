@@ -9,6 +9,7 @@ const userApi = baseApi.injectEndpoints({
           method: "GET",
         };
       },
+      providesTags: ["User"],
     }),
     getUserById: builder.query({
       query: (id: string) => {
@@ -17,6 +18,7 @@ const userApi = baseApi.injectEndpoints({
           method: "GET",
         };
       },
+      providesTags: (result, error, id) => [{ type: "Users", id }],
     }),
     deleteUser: builder.mutation({
       query: (id: string) => {
@@ -25,6 +27,10 @@ const userApi = baseApi.injectEndpoints({
           method: "DELETE",
         };
       },
+      invalidatesTags: (result, error, id) => [
+        "Users",
+        { type: "Users", id },
+      ],
     }),
     updateUser: builder.mutation({
       query: ({ id, body }) => ({
@@ -32,6 +38,10 @@ const userApi = baseApi.injectEndpoints({
         method: "PUT",
         body,
       }),
+      invalidatesTags: (result, error, { id }) => [
+        "Users",
+        { type: "Users", id },
+      ],
     }),
     blockUser: builder.mutation({
       query: (id: string) => {
@@ -40,6 +50,10 @@ const userApi = baseApi.injectEndpoints({
           method: "DELETE",
         };
       },
+      invalidatesTags: (result, error, id) => [
+        "Users",
+        { type: "Users", id },
+      ],
     }),
     getAllUsers: builder.query({
       query: (query) => {
@@ -49,6 +63,7 @@ const userApi = baseApi.injectEndpoints({
           params: query,
         };
       },
+      providesTags: ["Users"],
     }),
     getAdminUserAnalysis: builder.query({
       query: (query) => {
@@ -58,6 +73,7 @@ const userApi = baseApi.injectEndpoints({
           params: query,
         };
       },
+      providesTags: ["Users"],
     }),
     getAdminUserStats: builder.query({
       query: () => {
@@ -66,6 +82,7 @@ const userApi = baseApi.injectEndpoints({
           method: "GET",
         };
       },
+      providesTags: ["Users"],
     }),
     emailUser: builder.mutation({
       query: (email) => {
@@ -75,6 +92,7 @@ const userApi = baseApi.injectEndpoints({
           body: email,
         };
       },
+      invalidatesTags: ["Users"],
     }),
   }),
 });

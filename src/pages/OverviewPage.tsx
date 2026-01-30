@@ -41,7 +41,12 @@ export default function OverviewPage() {
     storDashboardData({
       users: statsData.data.totalUsers,
       newUsers: statsData.data.newUsersLastNDays,
-      issues: statsData.data.totalReports,
+      totalReports: statsData.data.totalReports,
+      newUsersPercent: statsData.data.newUsersPercent,
+      currentMonthUsers: statsData.data.currentMonthUsers,
+      activeUsersPercent: statsData.data.activeUsersPercent,
+      inactiveUsers: statsData.data.inactiveUsers,
+      inactiveUsersPercent: statsData.data.inactiveUsersPercent,
     })
   );
 

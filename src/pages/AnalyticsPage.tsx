@@ -10,66 +10,24 @@ import {
 } from "recharts";
 import RevenueChart from "../components/RevenueChart";
 import { useState } from "react";
-import { useGetAdminUserAnalysisQuery } from "../redux/features/user/userApi";
-import { useAppSelector } from "../redux/hooks/hooks";
+import { useGetAdminUserAnalysisQuery, useGetAdminUserStatsQuery } from "../redux/features/user/userApi";
+
 type Period = "daily" | "monthly" | "yearly";
-interface UserData {
-  totalUsers: number;
-  newUsers: number;
-  lastMonthTotalUsers?: number; // Optional
-  lastMonthNewUsers?: number; // Optional
-}
-
-function calculateUserMetrics(data: UserData) {
-  const activeUsers = data.totalUsers - data.newUsers;
-  const inactiveUsers =
-    data.lastMonthTotalUsers !== undefined
-      ? data.lastMonthTotalUsers - data.lastMonthNewUsers!
-      : 0;
-
-  const activeUsersIncrease =
-    data.lastMonthTotalUsers !== undefined
-      ? ((activeUsers -
-          (data.lastMonthTotalUsers - (data.lastMonthNewUsers || 0))) /
-          (data.lastMonthTotalUsers - (data.lastMonthNewUsers || 0))) *
-        100
-      : undefined;
-
-  const newUsersIncrease =
-    data.lastMonthNewUsers !== undefined
-      ? ((data.newUsers - data.lastMonthNewUsers) / data.lastMonthNewUsers) *
-        100
-      : undefined;
-
-  const inactiveUsersIncrease =
-    data.lastMonthTotalUsers !== undefined
-      ? ((inactiveUsers -
-          (data.lastMonthTotalUsers - (data.lastMonthNewUsers || 0))) /
-          (data.lastMonthTotalUsers - (data.lastMonthNewUsers || 0))) *
-        100
-      : undefined;
-
-  return {
-    activeUsers,
-    inactiveUsers,
-    activeUsersIncrease,
-    newUsersIncrease,
-    inactiveUsersIncrease,
-  };
-}
 
 // Example usage with missing last month data
 
 export default function AnalyticsPage() {
   const [period, setPeriod] = useState("daily");
-  const { newUsers, users } = useAppSelector(
-    (state) => state.user.dashboardData
-  );
+
 
   const { data, isLoading } = useGetAdminUserAnalysisQuery({
     type: period,
   });
-  if (isLoading) {
+    const { data: statsData, isLoading: isLoadingStats } =
+      useGetAdminUserStatsQuery({
+        type: period,
+      });
+  if (isLoading || isLoadingStats) {
     return <div className="p-8">Loading...</div>;
   }
 
@@ -81,12 +39,7 @@ export default function AnalyticsPage() {
     monthly: data.monthly,
     yearly: data.yearly,
   };
-  const userData: UserData = {
-    totalUsers: users,
-    newUsers,
-    // lastMonthTotalUsers and lastMonthNewUsers are not provided
-  };
-  const metrics = calculateUserMetrics(userData);
+
   return (
     <div className="p-8">
       <h1 className="text-3xl font-bold text-sky-900 mb-8">Analytics</h1>
@@ -97,10 +50,10 @@ export default function AnalyticsPage() {
           {" "}
           <div className="bg-white border border-gray-200 rounded-2xl p-6">
             <p className="text-lg font-semibold text-sky-900 mb-2">New Users</p>
-            <p className="text-4xl font-bold text-sky-900 mb-2">{newUsers}</p>
+            <p className="text-4xl font-bold text-sky-900 mb-2">{statsData.data.newUsers}</p>
             <p className="text-end text-sm font-semibold text-sky-900">
-              <span className="text-green-600 text-sm font-semibold mr-2 bg-gray-100 p-[2px]">
-                +{metrics.newUsersIncrease?.toFixed(2) || 0}%
+              <span className={`${statsData.data.newUsersPercent < 0 ? "text-red-600" : "text-green-600"} text-sm font-semibold mr-2 bg-gray-100 p-[2px]`}>
+                {statsData.data.newUsersPercent}%
               </span>
               More than last month
             </p>
@@ -110,11 +63,13 @@ export default function AnalyticsPage() {
               Active Users
             </p>
             <p className="text-4xl font-bold text-sky-900 mb-2">
-              {metrics.activeUsers}
+              {statsData.data.totalUsers - statsData.data.inactiveUsers}
             </p>
             <p className="text-end text-sm font-semibold text-sky-900">
-              <span className="text-green-600 text-sm font-semibold mr-2 bg-gray-100 p-[2px]">
-                +{metrics.activeUsersIncrease?.toFixed(2) || 0}%
+              <span
+                className={`${statsData.data.activeUsersPercent < 0 ? "text-red-600" : "text-green-600"} text-sm font-semibold mr-2 bg-gray-100 p-[2px]`}
+              >
+                {statsData.data.activeUsersPercent}%
               </span>
               More than last month
             </p>
@@ -124,11 +79,11 @@ export default function AnalyticsPage() {
               Inactive Users
             </p>
             <p className="text-4xl font-bold text-sky-900 mb-2">
-              {metrics.inactiveUsers}
+              {statsData.data.inactiveUsers}
             </p>
             <p className="text-end text-sm font-semibold text-sky-900">
-              <span className="text-green-600 text-sm font-semibold mr-2 bg-gray-100 p-[2px]">
-                +{metrics.inactiveUsersIncrease?.toFixed(2) || 0}%
+              <span className={`${statsData.data.inactiveUsersPercent < 0 ? "text-red-600" : "text-green-600"} text-sm font-semibold mr-2 bg-gray-100 p-[2px]`}>
+                {statsData.data.inactiveUsersPercent}%
               </span>
               More than last month
             </p>

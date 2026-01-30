@@ -1,6 +1,6 @@
 import { baseApi } from "../../services/API";
 
-const authApi = baseApi.injectEndpoints({
+const reportApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     login: builder.mutation({
       query: (user) => {
@@ -10,7 +10,7 @@ const authApi = baseApi.injectEndpoints({
           body: user,
         };
       },
-      invalidatesTags: ["getUser"],
+      invalidatesTags: ["Auth", "User"],
     }),
     getAllReports: builder.query({
       query: () => {
@@ -19,8 +19,18 @@ const authApi = baseApi.injectEndpoints({
           method: "GET",
         };
       },
+      providesTags: ["Reports"],
+    }),
+    getSystemReports: builder.query({
+      query: () => {
+        return {
+          url: "performance",
+          method: "GET",
+        };
+      },
+      providesTags: ["Reports"],
     }),
   }),
 });
 
-export const { useLoginMutation, useGetAllReportsQuery } = authApi;
+export const { useLoginMutation, useGetAllReportsQuery,useGetSystemReportsQuery } = reportApi;
