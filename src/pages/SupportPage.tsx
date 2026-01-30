@@ -4,7 +4,9 @@ import UserReportCard from "../components/UserReportCard";
 import UserFeedbackCard from "../components/UserFeedbackCard";
 import UserFeedbackModal from "../components/UserFeedbackModal";
 import { useGetAllReportsQuery } from "../redux/features/reports/reportsApi";
-import { useGetAllFeedbackQuery } from "../redux/features/feedbacks/feedbackApi";
+import { useGetAllFeedbackQuery, useUpdateStatusOfFeedbackMutation } from "../redux/features/feedbacks/feedbackApi";
+import Loader from "../components/Loader";
+import { toast } from "sonner";
 
 type Category = "issues" | "feedback" | "system";
 
@@ -44,14 +46,29 @@ const SupportPage: React.FC = () => {
   const { data, isLoading } = useGetAllReportsQuery(undefined);
   const { data: feedbacks, isLoading: isFeedbackLoading } =
     useGetAllFeedbackQuery(undefined);
-  if (isLoading || isFeedbackLoading) {
+const [updateStatusOfFeedback,{isLoading: isUpdatingFeedback}] = useUpdateStatusOfFeedbackMutation()
+
+
+
+  if (isLoading || isFeedbackLoading || isUpdatingFeedback) {
     return (
-      <div>
-        <b>loading...</b>
-      </div>
+      <Loader />
     );
   }
-
+const handleMarkFeedbackCompleted = async (feedbackId: string) => {
+  try {
+    const res = await updateStatusOfFeedback(feedbackId)
+    if(res.error){
+      toast.error("Failed to update feedback status")
+    }
+    if(res.data.status === "success"){
+      handleCloseReportModal()
+      toast.success("Feedback marked as Completed")
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
   const handleViewReport = (report: ReportData) => {
     setSelectedReport(report);
     setShowReportModal(true);
@@ -293,7 +310,7 @@ const SupportPage: React.FC = () => {
               >
                 Close
               </button>
-              <button className="px-6 py-2 bg-sky-900 hover:bg-sky-800 text-white rounded-lg font-semibold transition">
+              <button onClick={()=>handleMarkFeedbackCompleted(selectedReport._id)} className="px-6 py-2 bg-sky-900 hover:bg-sky-800 text-white rounded-lg font-semibold transition">
                 Take Action
               </button>
             </div>

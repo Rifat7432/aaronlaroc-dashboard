@@ -1,5 +1,6 @@
 import React from "react";
 import { Download, Calendar, AlertCircle, CheckCircle, Clock } from "lucide-react";
+import jsPDF from "jspdf";
 
 export interface UserReportData {
   _id: string;
@@ -48,7 +49,13 @@ const getStatusColor = (status: string): string => {
       return "bg-yellow-100 text-yellow-800";
   }
 };
-
+const formatDate = (dateString: string): string => {
+  return new Date(dateString).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+};
 const MonthlyUserReportsCard: React.FC<MonthlyUserReportsCardProps> = ({
   reports,
   month,
@@ -70,7 +77,148 @@ const MonthlyUserReportsCard: React.FC<MonthlyUserReportsCardProps> = ({
       r.status?.toLowerCase() === "in progress"
   ).length;
   const pendingCount = reports.length - completedCount - progressCount;
+  const handleDownloadPDF = () => {
+    try {
+      const doc = new jsPDF();
+      let yPosition = 20;
 
+      // Title
+      doc.setFontSize(18);
+      doc.setFont("Helvetica", "bold");
+      doc.text(`Monthly User Reports - ${monthName}`, 20, yPosition);
+      yPosition += 10;
+
+      // Generated date
+      doc.setFontSize(10);
+      doc.setFont("Helvetica", "normal");
+      doc.text(`Generated: ${new Date().toLocaleString()}`, 20, yPosition);
+      doc.text(`Total Reports: ${reports.length}`, 120, yPosition);
+      yPosition += 8;
+
+      // Divider
+      doc.setDrawColor(200);
+      doc.line(20, yPosition, 190, yPosition);
+      yPosition += 8;
+
+      // Summary Statistics
+      const completedCount = reports.filter(
+        (r) => r.status?.toLowerCase() === "completed"
+      ).length;
+      const progressCount = reports.filter(
+        (r) =>
+          r.status?.toLowerCase() === "progress" ||
+          r.status?.toLowerCase() === "in progress"
+      ).length;
+      const pendingCount = reports.length - completedCount - progressCount;
+
+      doc.setFontSize(11);
+      doc.setFont("Helvetica", "bold");
+      doc.text("Summary Statistics", 20, yPosition);
+      yPosition += 6;
+
+      doc.setFontSize(10);
+      doc.setFont("Helvetica", "normal");
+      const summaryData = [
+        ["Total Reports", reports.length.toString()],
+        ["Completed", completedCount.toString()],
+        ["In Progress", progressCount.toString()],
+        ["Pending", pendingCount.toString()],
+      ];
+
+      summaryData.forEach(([label, value]) => {
+        doc.text(`${label}:`, 20, yPosition);
+        doc.text(value, 120, yPosition);
+        yPosition += 5;
+      });
+
+      yPosition += 5;
+
+      // Detailed Reports
+      doc.setFontSize(11);
+      doc.setFont("Helvetica", "bold");
+      doc.text("Detailed Reports", 20, yPosition);
+      yPosition += 6;
+
+      // Report entries
+      doc.setFontSize(9);
+      doc.setFont("Helvetica", "normal");
+
+      reports.forEach((report, index) => {
+        // Check if we need a new page
+        if (yPosition > 250) {
+          doc.addPage();
+          yPosition = 20;
+        }
+
+        // Report number
+        doc.setFont("Helvetica", "bold");
+        doc.text(`Report ${index + 1}:`, 20, yPosition);
+        yPosition += 4;
+
+        // Problem title
+        doc.setFont("Helvetica", "normal");
+        doc.text("Problem:", 20, yPosition);
+        const titleLines = doc.splitTextToSize(report.problemtitle, 160);
+        doc.text(titleLines, 50, yPosition);
+        yPosition += Math.max(4, titleLines.length * 3) + 2;
+
+        // User info
+        doc.text("User:", 20, yPosition);
+        doc.text(`${report.userID.firstName} ${report.userID.lastName}`, 50, yPosition);
+        yPosition += 4;
+        doc.text("Email:", 20, yPosition);
+        doc.text(report.userID.email, 50, yPosition);
+        yPosition += 4;
+
+        // Status
+        doc.text("Status:", 20, yPosition);
+        doc.text(report.status, 50, yPosition);
+        yPosition += 4;
+
+        // Dates
+        doc.text("Created:", 20, yPosition);
+        doc.text(formatDate(report.createdAt), 50, yPosition);
+        yPosition += 4;
+
+        // Description
+        doc.setFont("Helvetica", "bold");
+        doc.text("Description:", 20, yPosition);
+        yPosition += 3;
+
+        doc.setFont("Helvetica", "normal");
+        const descLines = doc.splitTextToSize(report.desdetails, 160);
+        doc.text(descLines, 20, yPosition);
+        yPosition += descLines.length * 3 + 4;
+
+        // Separator
+        doc.setDrawColor(220);
+        doc.line(20, yPosition, 190, yPosition);
+        yPosition += 6;
+      });
+
+      // Footer
+      yPosition = 270;
+      doc.setFontSize(8);
+      doc.setFont("Helvetica", "italic");
+      doc.setTextColor(128);
+      doc.text(
+        "Aaron Laroc Dashboard • Monthly User Reports",
+        20,
+        yPosition
+      );
+      doc.text(
+        `Generated on ${new Date().toLocaleString()}`,
+        20,
+        280
+      );
+
+      // Save PDF
+      doc.save(`monthly-user-reports-${year}-${String(month).padStart(2, "0")}.pdf`);
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      alert("Failed to generate PDF. Please try again.");
+    }
+  };
   return (
     <div className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow overflow-hidden">
       {/* Header */}
@@ -83,15 +231,15 @@ const MonthlyUserReportsCard: React.FC<MonthlyUserReportsCardProps> = ({
               <p className="text-sky-100 text-sm">Monthly Report Summary</p>
             </div>
           </div>
-          {onDownload && (
+       
             <button
-              onClick={onDownload}
+              onClick={handleDownloadPDF}
               className="bg-white hover:bg-sky-50 text-sky-900 p-2 rounded-lg transition"
               title="Download Monthly PDF"
             >
               <Download size={18} />
             </button>
-          )}
+      
         </div>
       </div>
 

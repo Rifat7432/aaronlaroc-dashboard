@@ -14,6 +14,7 @@ import {
 } from "../redux/features/user/userApi";
 import { storDashboardData } from "../redux/features/user/userSlice";
 import { useAppDispatch } from "../redux/hooks/hooks";
+import Loader from "../components/Loader";
 
 type Period = "daily" | "monthly" | "yearly";
 
@@ -31,7 +32,7 @@ export default function OverviewPage() {
       type: period,
     });
   if (isLoading || isLoadingStats) {
-    return <div className="p-8">Loading...</div>;
+    return <Loader />;
   }
 
   if (!data || !statsData) {

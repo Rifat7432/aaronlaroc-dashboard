@@ -96,7 +96,7 @@ export default function ResetPassword() {
             type="submit"
             className="w-full py-3 bg-sky-800 hover:bg-sky-900 text-white font-semibold rounded-lg"
           >
-            {isLoading ? "loading..." : "Reset password"}
+            {isLoading ? "Loading..." : "Reset password"}
           </button>
         </form>
 

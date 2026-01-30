@@ -2,12 +2,12 @@ import { baseApi } from "../../services/API";
 
 const feedbackApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    login: builder.mutation({
-      query: (user) => {
+    updateStatusOfFeedback: builder.mutation({
+      query: (id) => {
         return {
-          url: "adminlogin",
-          method: "POST",
-          body: user,
+          url: `reports/${id}`,
+          method: "PUT",
+          body: { status: "Completed" },
         };
       },
       invalidatesTags: ["Auth", "User"],
@@ -24,4 +24,4 @@ const feedbackApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useLoginMutation, useGetAllFeedbackQuery } = feedbackApi;
+export const { useUpdateStatusOfFeedbackMutation, useGetAllFeedbackQuery } = feedbackApi;

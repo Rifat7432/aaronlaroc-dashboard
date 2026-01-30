@@ -11,6 +11,7 @@ import {
 import RevenueChart from "../components/RevenueChart";
 import { useState } from "react";
 import { useGetAdminUserAnalysisQuery, useGetAdminUserStatsQuery } from "../redux/features/user/userApi";
+import Loader from "../components/Loader";
 
 type Period = "daily" | "monthly" | "yearly";
 
@@ -28,7 +29,7 @@ export default function AnalyticsPage() {
         type: period,
       });
   if (isLoading || isLoadingStats) {
-    return <div className="p-8">Loading...</div>;
+    return <Loader />;
   }
 
   if (!data) {

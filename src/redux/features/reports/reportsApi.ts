@@ -2,16 +2,6 @@ import { baseApi } from "../../services/API";
 
 const reportApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    login: builder.mutation({
-      query: (user) => {
-        return {
-          url: "adminlogin",
-          method: "POST",
-          body: user,
-        };
-      },
-      invalidatesTags: ["Auth", "User"],
-    }),
     getAllReports: builder.query({
       query: () => {
         return {
@@ -30,7 +20,16 @@ const reportApi = baseApi.injectEndpoints({
       },
       providesTags: ["Reports"],
     }),
+    getMonthlyEarningsStats: builder.query({
+      query: () => {
+        return {
+          url: "monthly-earnings-stats",
+          method: "GET",
+        };
+      },
+      providesTags: ["Reports"],
+    }),
   }),
 });
 
-export const { useLoginMutation, useGetAllReportsQuery,useGetSystemReportsQuery } = reportApi;
+export const {  useGetMonthlyEarningsStatsQuery,useGetAllReportsQuery,useGetSystemReportsQuery } = reportApi;
