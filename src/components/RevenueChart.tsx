@@ -7,19 +7,16 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Line,
-  LineChart,
 } from "recharts";
+import { useGetMonthlyEarningsAnalyticsQuery } from "../redux/features/reports/reportsApi";
+import Loader from "./Loader";
 
 interface RevenueData {
   month: string;
   revenue: number;
 }
 
-interface ProfitData {
-  month: string;
-  profit: number;
-}
+
 
 interface CustomTooltipProps {
   active?: boolean;
@@ -36,27 +33,17 @@ interface CustomDotProps {
   payload?: RevenueData;
 }
 
-const revenueData: RevenueData[] = [
-  { month: "Jan", revenue: 65000 },
-  { month: "Feb", revenue: 78000 },
-  { month: "Mar", revenue: 72000 },
-  { month: "Apr", revenue: 85000 },
-  { month: "May", revenue: 92000 },
-  { month: "Jun", revenue: 88000 },
-  { month: "Jul", revenue: 95000 },
-  { month: "Aug", revenue: 86500 },
-];
+// const revenueData: RevenueData[] = [
+//   { month: "Jan", revenue: 65000 },
+//   { month: "Feb", revenue: 78000 },
+//   { month: "Mar", revenue: 72000 },
+//   { month: "Apr", revenue: 85000 },
+//   { month: "May", revenue: 92000 },
+//   { month: "Jun", revenue: 88000 },
+//   { month: "Jul", revenue: 95000 },
+//   { month: "Aug", revenue: 86500 },
+// ];
 
-const profitData: ProfitData[] = [
-  { month: "Jan", profit: 82000 },
-  { month: "Feb", profit: 78000 },
-  { month: "Mar", profit: 88000 },
-  { month: "Apr", profit: 85000 },
-  { month: "May", profit: 92000 },
-  { month: "Jun", profit: 87000 },
-  { month: "Jul", profit: 95000 },
-  { month: "Aug", profit: 91000 },
-];
 
 const CustomTooltip: React.FC<CustomTooltipProps> = ({
   active,
@@ -127,7 +114,13 @@ const CustomDot: React.FC<CustomDotProps> = (props) => {
   return null;
 };
 
-const RevenueChart: React.FC = () => {
+const RevenueChart = () => {
+  const {data:revenueData, isLoading} =  useGetMonthlyEarningsAnalyticsQuery(undefined);
+
+
+  if (isLoading) {
+    return <Loader></Loader>;
+  }
   return (
     <div className="">
        <div className="bg-white border border-gray-200 rounded-2xl p-6">
@@ -151,7 +144,7 @@ const RevenueChart: React.FC = () => {
           {/* Left Chart - Area Chart */}
           <div className="flex-1">
             <ResponsiveContainer width="100%" height={200}>
-              <AreaChart data={revenueData}>
+              <AreaChart data={revenueData.data}>
                 <defs>
                   <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#A78BFA" stopOpacity={0.3} />
@@ -185,7 +178,7 @@ const RevenueChart: React.FC = () => {
           </div>
 
           {/* Right Chart - Dashed Line Chart */}
-          <div className="flex-1">
+          {/* <div className="flex-1">
             <ResponsiveContainer width="100%" height={200}>
               <LineChart data={profitData}>
                 <CartesianGrid
@@ -212,7 +205,7 @@ const RevenueChart: React.FC = () => {
                 />
               </LineChart>
             </ResponsiveContainer>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

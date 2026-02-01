@@ -18,7 +18,7 @@ const userApi = baseApi.injectEndpoints({
           method: "GET",
         };
       },
-      providesTags: (result, error, id) => [{ type: "Users", id }],
+      providesTags: ["Users"],
     }),
     deleteUser: builder.mutation({
       query: (id: string) => {
@@ -27,10 +27,7 @@ const userApi = baseApi.injectEndpoints({
           method: "DELETE",
         };
       },
-      invalidatesTags: (result, error, id) => [
-        "Users",
-        { type: "Users", id },
-      ],
+      invalidatesTags: ["Users"],
     }),
     updateUser: builder.mutation({
       query: ({ id, body }) => ({
@@ -38,10 +35,7 @@ const userApi = baseApi.injectEndpoints({
         method: "PUT",
         body,
       }),
-      invalidatesTags: (result, error, { id }) => [
-        "Users",
-        { type: "Users", id },
-      ],
+      invalidatesTags: ["Users"],
     }),
     blockUser: builder.mutation({
       query: (id: string) => {
@@ -50,10 +44,7 @@ const userApi = baseApi.injectEndpoints({
           method: "DELETE",
         };
       },
-      invalidatesTags: (result, error, id) => [
-        "Users",
-        { type: "Users", id },
-      ],
+      invalidatesTags: ["Users"],
     }),
     getAllUsers: builder.query({
       query: (query) => {

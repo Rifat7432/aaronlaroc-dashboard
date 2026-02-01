@@ -29,7 +29,16 @@ const reportApi = baseApi.injectEndpoints({
       },
       providesTags: ["Reports"],
     }),
+    getMonthlyEarningsAnalytics: builder.query({
+      query: () => {
+        return {
+          url: "subscriptions/stats",
+          method: "GET",
+        };
+      },
+      providesTags: ["Reports"],
+    }),
   }),
 });
 
-export const {  useGetMonthlyEarningsStatsQuery,useGetAllReportsQuery,useGetSystemReportsQuery } = reportApi;
+export const {  useGetMonthlyEarningsStatsQuery,useGetAllReportsQuery,useGetSystemReportsQuery,useGetMonthlyEarningsAnalyticsQuery } = reportApi;

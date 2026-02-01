@@ -29,7 +29,7 @@ export default function AnalyticsPage() {
         type: period,
       });
   if (isLoading || isLoadingStats) {
-    return <Loader />;
+    return <Loader></Loader>;
   }
 
   if (!data) {
