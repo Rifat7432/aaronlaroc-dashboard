@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -7,6 +8,8 @@ import {
   useGetAllUsersQuery,
   useUpdateUserMutation,
 } from "../redux/features/user/userApi";
+import { useAppSelector } from "../redux/hooks/hooks";
+import { jwtDecode } from "jwt-decode";
 
 const LIMIT = 10;
 
@@ -31,12 +34,16 @@ interface UserForm {
 }
 
 const AllUsers: React.FC = () => {
+  const token = useAppSelector((state) => state.auth.token);
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
 
+  const decoded = jwtDecode(token as string);
+  const { exp, iat, ...userData } = decoded;
+  const isSuperAdmin = (userData as any)?.role === "SUPER_ADMIN";
   const {
     register: editRegister,
     handleSubmit: handleEditSubmit,
@@ -44,7 +51,7 @@ const AllUsers: React.FC = () => {
   } = useForm<UserForm>();
 
   const { data } = useGetAllUsersQuery({
-    pageNo:page,
+    pageNo: page,
     perPage: LIMIT,
     searchKeyword: searchTerm || undefined,
   });
@@ -55,7 +62,7 @@ const AllUsers: React.FC = () => {
   const users: User[] =
     data?.data.rows.map((u: any, i: number) => ({
       _id: u._id,
-      id: i+1,
+      id: i + 1,
       name: u.email.split("@")[0], // using email as name placeholder
       email: u.email,
       phone: u.phoneNumber,
@@ -141,16 +148,25 @@ const AllUsers: React.FC = () => {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <h3 className="text-xl font-bold text-sky-800">All Users</h3>
             <div className="flex gap-3">
-              <input
-                type="text"
-                placeholder="Search users..."
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setPage(1);
-                }}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-900 focus:border-transparent"
-              />
+              <div className="flex flex-col">
+                <label
+                  htmlFor="search"
+                  className="text-sm font-medium text-gray-700 mb-1"
+                >
+                  Search Users
+                </label>
+                <input
+                  id="search"
+                  type="text"
+                  placeholder="Search users..."
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setPage(1);
+                  }}
+                  className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-900 focus:border-transparent"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -208,8 +224,8 @@ const AllUsers: React.FC = () => {
                         user.role === "Admin"
                           ? "bg-purple-100 text-purple-800"
                           : user.role === "Manager"
-                          ? "bg-sky-100 text-sky-800"
-                          : "bg-gray-100 text-gray-800"
+                            ? "bg-sky-100 text-sky-800"
+                            : "bg-gray-100 text-gray-800"
                       }`}
                     >
                       {user.role}
@@ -294,28 +310,82 @@ const AllUsers: React.FC = () => {
             </div>
             <form onSubmit={handleEditSubmit(onEditSubmitHandler)}>
               <div className="p-6 space-y-4">
-                <input
-                  {...editRegister("name")}
-                  placeholder="Name"
-                  className="border p-2 w-full rounded"
-                />
-                <input
-                  {...editRegister("email")}
-                  placeholder="Email"
-                  className="border p-2 w-full rounded"
-                />
-                <input
-                  {...editRegister("phone")}
-                  placeholder="Phone"
-                  className="border p-2 w-full rounded"
-                />
-                <select
-                  {...editRegister("status")}
-                  className="border p-2 w-full rounded"
-                >
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
-                </select>
+                <div>
+                  <label
+                    htmlFor="name"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Name
+                  </label>
+                  <input
+                    id="name"
+                    {...editRegister("name")}
+                    placeholder="Enter name"
+                    className="border border-gray-300 p-2 w-full rounded focus:outline-none focus:ring-2 focus:ring-sky-900"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Email
+                  </label>
+                  <input
+                    id="email"
+                    {...editRegister("email")}
+                    placeholder="Enter email"
+                    className="border border-gray-300 p-2 w-full rounded focus:outline-none focus:ring-2 focus:ring-sky-900"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="phone"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Phone
+                  </label>
+                  <input
+                    id="phone"
+                    {...editRegister("phone")}
+                    placeholder="Enter phone number"
+                    className="border border-gray-300 p-2 w-full rounded focus:outline-none focus:ring-2 focus:ring-sky-900"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="status"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Status
+                  </label>
+                  <select
+                    id="status"
+                    {...editRegister("status")}
+                    className="border border-gray-300 p-2 w-full rounded focus:outline-none focus:ring-2 focus:ring-sky-900"
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
+                </div>
+                {isSuperAdmin && (
+                  <div>
+                    <label
+                      htmlFor="role"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Role
+                    </label>
+                    <select
+                      id="role"
+                      {...editRegister("role")}
+                      className="border border-gray-300 p-2 w-full rounded focus:outline-none focus:ring-2 focus:ring-sky-900"
+                    >
+                      <option value="Admin">Admin</option>
+                      <option value="User">User</option>
+                    </select>
+                  </div>
+                )}
               </div>
               <div className="p-6 border-t border-gray-200 flex gap-3">
                 <button

@@ -116,6 +116,7 @@ export default function OTPVerification() {
         </p>
 
         {/* OTP Input Boxes */}
+        <label className="block text-sm font-medium text-gray-700 mb-3 text-center">Enter Verification Code</label>
         <div className="flex justify-center gap-3 mb-6">
           {otp.map((digit, index) => (
             <input

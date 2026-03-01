@@ -93,7 +93,9 @@ const LoginPage: React.FC = () => {
           {/* 🔥 FORM START */}
           <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
             <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
               <input
+                id="email"
                 type="email"
                 {...register("email", { required: "Email is required" })}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-700 focus:border-transparent bg-gray-50"
@@ -107,7 +109,9 @@ const LoginPage: React.FC = () => {
             </div>
 
             <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Password</label>
               <input
+                id="password"
                 type="password"
                 {...register("password", { required: "Password is required" })}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-700 focus:border-transparent bg-gray-50"

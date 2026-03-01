@@ -14,12 +14,17 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
   // You can also check for token
   // const token = localStorage.getItem("accessToken");
   const token = useAppSelector((state) => state.auth.token);
-  if(!token) {
+  if (!token) {
     return <Navigate to="/login" replace />;
   }
   const decoded = jwtDecode(token as string);
   const { exp, iat, ...userData } = decoded;
-  const isAuthenticated = (userData as any)?.role === "ADMIN";
+  const isAuthenticated =
+    (userData as any)?.role === "ADMIN"
+      ? true
+      : (userData as any)?.role === "SUPER_ADMIN"
+        ? true
+        : false;
 
   if (!isAuthenticated) {
     // Redirect to login if not authenticated
@@ -31,7 +36,6 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
 };
 
 export default PrivateRoute;
-
 
 // ============================================
 // Alternative: PrivateRoute with role-based access

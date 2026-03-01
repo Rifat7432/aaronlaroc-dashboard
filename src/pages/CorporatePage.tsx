@@ -249,13 +249,17 @@ const CorporatePage: React.FC = () => {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <h3 className="text-xl font-bold text-sky-800">All Users</h3>
             <div className="flex gap-3">
-              <input
-                type="text"
-                placeholder="Search users..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-900 focus:border-transparent"
-              />
+              <div className="flex flex-col">
+                <label htmlFor="corporate-search" className="text-sm font-medium text-gray-700 mb-1">Search Users</label>
+                <input
+                  id="corporate-search"
+                  type="text"
+                  placeholder="Search users..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-900 focus:border-transparent"
+                />
+              </div>
               <button
                 onClick={() => setShowAddModal(true)}
                 className="bg-sky-800 text-white px-4 py-2 rounded-lg font-semibold hover:bg-sky-900 transition duration-200"
